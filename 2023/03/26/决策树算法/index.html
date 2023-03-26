@@ -1,0 +1,951 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261717175.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ZYC">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="python中的sklearn实现决策树算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树算法">
+<meta property="og:url" content="http://zyc.com/2023/03/26/%E5%86%B3%E7%AD%96%E6%A0%91%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="ZYC">
+<meta property="og:description" content="python中的sklearn实现决策树算法">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261439290.jpg">
+<meta property="article:published_time" content="2023-03-26T02:06:36.000Z">
+<meta property="article:modified_time" content="2023-03-26T08:37:18.076Z">
+<meta property="article:author" content="ZYC">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="决策树">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261439290.jpg">
+  
+  
+  
+  <title>决策树算法 - ZYC</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/macpanel.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zyc.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>ZYC</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="决策树算法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-03-26 10:06" pubdate>
+          2023年3月26日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          87 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">决策树算法</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="1-sklearn中的决策树"><a href="#1-sklearn中的决策树" class="headerlink" title="1.sklearn中的决策树"></a>1.sklearn中的决策树</h1><ul>
+<li>模块sklearn.tree(scikit-learn)</li>
+</ul>
+<p>sklearn中决策树的类都在”tree“这个模块之下。这个模块总共包含五个类：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>tree.DecisionTreeClassiﬁer</th>
+<th>分类树</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tree.DecisionTreeRegressor</td>
+<td>回归树</td>
+</tr>
+<tr>
+<td>tree.export_graphviz</td>
+<td>将生成的决策树导出为DOT格式，画图专用</td>
+</tr>
+<tr>
+<td>tree.ExtraTreeClassiﬁer</td>
+<td>高随机版本的分类树</td>
+</tr>
+<tr>
+<td>tree.ExtraTreeRegressor</td>
+<td>高随机版本的回归树</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>sklearn建模的基本流程：</p>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007181.png" srcset="/img/loading.gif" lazyload alt="image-20230316161926873"></p>
+<p>在这个流程下，对应的代码为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> sklearn <span class="hljs-keyword">import</span> tree <span class="hljs-comment">#导入需要的模块</span><br>clf = tree.DecisionTreeClassifier()     <span class="hljs-comment">#实例化</span><br>clf = clf.fit(X_train,y_train) <span class="hljs-comment">#用训练集数据训练模型</span><br>result = clf.score(X_test,y_test) <span class="hljs-comment">#导入测试集，从接口中调用需要的信息</span><br></code></pre></td></tr></table></figure>
+<h1 id="2-DecisionTreeClassifier"><a href="#2-DecisionTreeClassifier" class="headerlink" title="2.DecisionTreeClassifier"></a>2.<strong>DecisionTreeClassifier</strong></h1><p>class<code>sklearn.tree.DecisionTreeClassifier</code>(criterion=’gini’, splitter=’best’, max_depth=None,<br>min_samples_split=2, min_samples_leaf=1, min_weight_fraction_leaf=0.0, max_features=None,<br>random_state=None,max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None,<br>class_weight=None, presort=False)</p>
+<h2 id="2-1重要参数"><a href="#2-1重要参数" class="headerlink" title="2.1重要参数"></a>2.1重要参数</h2><h3 id="2-1-1criterion"><a href="#2-1-1criterion" class="headerlink" title="2.1.1criterion"></a>2.1.1criterion</h3><p>Criterion这个参数是决定决策树<strong>不纯度</strong>的计算方式的。</p>
+<p>sklearn提供了两种方式：</p>
+<ul>
+<li>输入”entropy“，使用<strong>信息熵</strong>（Entropy）</li>
+<li>输入”gini“，使用<strong>基尼系数</strong>（Gini Impurity）</li>
+</ul>
+<p>二者有什么区别呢？</p>
+<ul>
+<li>比起基尼系数，信息熵对不纯度更加敏感，对不纯度的惩罚最强。但是在实际使用中，<strong>信息熵和基尼系数的效果基</strong><br><strong>本相同</strong>。信息熵的计算比基尼系数缓慢一些，因为基尼系数的计算不涉及对数。另外，因为信息熵对不纯度更加敏<br>感，所以<strong>信息熵作为指标时，决策树的生长会更加“精细”</strong>，因此对于<strong>高维数据或者噪音很多</strong>的数据，信息熵很容易<br><strong>过拟合</strong>，基尼系数在这种情况下效果往往比较好。当然，这不是绝对的。</li>
+<li>信息熵其实算的是<strong>信息增益</strong>（也就是父节点和子节点的信息熵的差值，然后寻找使得差值最大的分类指标）<ul>
+<li>信息熵：<script type="math/tex">Ent\left( D \right) =-\sum_{k=1}^{|y|}{p_k\log _2p_k}</script><ul>
+<li>假定当前样本集合D中第k类样本所占的比例为$p_k(k=1,2,…|y|)$</li>
+<li><strong>Ent(D)的值越小，则D的纯度越大</strong></li>
+<li>Ent(D)的最小值为0，最大值为$log_2|y|$</li>
+<li>y表示标签的种类</li>
+<li><strong>信息熵越小，不确定越小，已知的信息越多，树节点的纯度越大</strong>（熵是指变化，熵越大，说明不确定性越大，则已知信息越小）</li>
+</ul>
+</li>
+<li>离散属性a有V个可能的取值{${a^1,a^2,…,a^n}$},用a来进行划分，则会产生V个分支结点，其中第v个分支结点包含了所有在属性上取值为$a^v$的样本，记为$D^v$。则可计算出用属性a对样本集D进行划分所获得的“信息增益”：<ul>
+<li><script type="math/tex; mode=display">Gain\left( D,a \right) =Ent\left( D \right) -\sum_{v=1}^V{\frac{|D^v|}{|D|}Ent\left( D^v \right)}</script></li>
+</ul>
+</li>
+<li>注意：信息增益<strong>倾向于选择产生大量小而纯</strong>的子集的分裂方案。用一个极端的例子来说明：当数据集的某个属性对于每一个实例存在一个不同属性值时，比如，一个标志码属性，按照信息增益值计算会被选择为分裂属性，但显然这是不合适的，因为ID属性对测试集中的分类是无益的。</li>
+</ul>
+</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>参数</strong></th>
+<th><strong>criterion</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>如何影响模型?</td>
+<td>确定不纯度的计算方法，帮忙找出最佳节点和最佳分枝，不纯度越低，决策树对训练集的拟合越好</td>
+</tr>
+<tr>
+<td>可能的输入有哪些？</td>
+<td><strong>不填默认基尼系数</strong>，填写gini使用基尼系数，填写entropy使用信息增益</td>
+</tr>
+<tr>
+<td>怎样选取参数？</td>
+<td>通常就使用基尼系数;<br />数据维度很大，噪音很大时使用基尼系数;<br />维度低，数据比较清晰的时候，信息熵和基尼系数没区别;<br />当决策树的<strong>拟合程度不够</strong>的时候，使用<strong>信息熵</strong>;<br />两个都试试，不好就换另外一个</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>[*zip(x,y)]这段代码什么意思？</p>
+</blockquote>
+<p>这段代码是用来将两个列表 <code>x</code> 和 <code>y</code> 中的元素配对并返回一个新的列表。每个元素都是一个元组，其中第一个元素来自 <code>x</code>，第二个元素来自 <code>y</code>。例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">x = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]<br>y = [<span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>]<br>result = [*<span class="hljs-built_in">zip</span>(x,y)]<br><span class="hljs-built_in">print</span>(result)<br></code></pre></td></tr></table></figure>
+<p>输出结果为：<code>[(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)]</code></p>
+<blockquote>
+<p>建立一颗树：</p>
+</blockquote>
+<p>1.导入需要的算法库和模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 导入算法库和模块</span><br><span class="hljs-keyword">from</span> sklearn <span class="hljs-keyword">import</span> tree<br><span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> load_wine <span class="hljs-comment"># 数据集，红酒数据</span><br><span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split <span class="hljs-comment"># 划分训练集和测试集</span><br></code></pre></td></tr></table></figure>
+<p>2.探索数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">wine = load_wine()<br>wine<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007170.png" srcset="/img/loading.gif" lazyload alt="image-20230317100233438" style="zoom: 80%;" /></p>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007142.png" srcset="/img/loading.gif" lazyload alt="image-20230317100301012" style="zoom:80%;" /></p>
+<p>合并数据和标签，形成一个表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">pd.concat([pd.DataFrame(wine.data), pd.DataFrame(wine.target,columns=[<span class="hljs-string">&#x27;target&#x27;</span>])], axis=<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+<ul>
+<li>axis=1表示按行索引合并</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">wine.feature_names <span class="hljs-comment"># 属性名</span><br>wine.target_names <span class="hljs-comment"># 标签名</span><br></code></pre></td></tr></table></figure>
+<hr>
+<p>3.<strong>训练集和测试集划分：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">Xtrain, Xtest, Ytrain, Ytest = train_test_split(wine.data, wine.target, test_size=<span class="hljs-number">0.3</span>)<br><span class="hljs-comment"># 这个train_test_split()函数有三个参数</span><br><span class="hljs-comment">#分别表示数据、标签、测试集和训练集比例</span><br><span class="hljs-comment">#0.3表示70%的训练集，30%的测试集，这里是随机划分的</span><br><span class="hljs-comment">#后面可以设置一个random_state参数，即设置一个随机数种子，使得划分固定</span><br></code></pre></td></tr></table></figure>
+<hr>
+<p>4.模型建立</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">clf = tree.DecisionTreeClassifier(criterion=<span class="hljs-string">&#x27;entropy&#x27;</span>)<br>clf = clf.fit(Xtrain, Ytrain) <span class="hljs-comment"># 模型训练</span><br>score = clf.score(Xtest, Ytest) <span class="hljs-comment"># 返回模型精确度，accuracy</span><br></code></pre></td></tr></table></figure>
+<p>5.绘制决策树</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">feature_name = [<span class="hljs-string">&#x27;酒精&#x27;</span>,<span class="hljs-string">&#x27;苹果酸&#x27;</span>,<span class="hljs-string">&#x27;灰&#x27;</span>,<span class="hljs-string">&#x27;灰的碱性&#x27;</span>,<span class="hljs-string">&#x27;镁&#x27;</span>,<span class="hljs-string">&#x27;总酚&#x27;</span>,<span class="hljs-string">&#x27;类黄酮&#x27;</span>,<span class="hljs-string">&#x27;非黄烷类酚类&#x27;</span>,<span class="hljs-string">&#x27;花青素&#x27;</span>,<span class="hljs-string">&#x27;颜色强度&#x27;</span>,<span class="hljs-string">&#x27;色调&#x27;</span>,<span class="hljs-string">&#x27;od280/od315稀释葡萄酒&#x27;</span>,<span class="hljs-string">&#x27;脯氨酸&#x27;</span>]<br><span class="hljs-keyword">import</span> graphviz<br>dot_data = tree.export_graphviz(clf<br>                                    ,feature_names= feature_name<br>                                    ,class_names=[<span class="hljs-string">&#x27;琴酒&#x27;</span>, <span class="hljs-string">&#x27;雪莉&#x27;</span>, <span class="hljs-string">&#x27;贝尔摩德&#x27;</span>]<br>                                    ,filled=<span class="hljs-literal">True</span><br>                                    ,rounded=<span class="hljs-literal">True</span>)<br>graph = graphviz.Source(dot_data) <br>graph<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007277.png" srcset="/img/loading.gif" lazyload alt="决策树1"></p>
+<hr>
+<p>6.探索决策树</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">[*<span class="hljs-built_in">zip</span>(feature_name,clf.feature_importances_)]<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007205.png" srcset="/img/loading.gif" lazyload alt="image-20230317102651230"></p>
+<p>这里可以用于判断不同的变量在决策过程中的重要性。（<strong>变量重要性</strong>）</p>
+<h3 id="2-1-2random-state-amp-splitter"><a href="#2-1-2random-state-amp-splitter" class="headerlink" title="2.1.2random_state &amp; splitter"></a>2.1.2random_state &amp; splitter</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">clf = tree.DecisionTreeClassifier(criterion=<span class="hljs-string">&quot;entropy&quot;</span>,random_state=<span class="hljs-number">30</span>) <span class="hljs-comment"># 这里的random_state可以使score保持稳定</span><br>clf = clf.fit(Xtrain, Ytrain)<br>score = clf.score(Xtest, Ytest) <span class="hljs-comment">#返回预测的准确度</span><br>score<br></code></pre></td></tr></table></figure>
+<p>上述代码和之前的模型构建部分有一点不同，在于设置了<strong>random_state</strong>这个参数。</p>
+<p>那个这个参数有什么用呢？</p>
+<blockquote>
+<p>使用new bing回答这个问题：</p>
+</blockquote>
+<p>问1：sklearn中random_state参数有什么用？</p>
+<p>答1：sklearn中的random_state参数是用来<strong>控制随机性</strong>的。它可以是一个整数，一个RandomState实例或者None。如果是一个整数，它就是一个随机种子，可以使得多次函数调用产生相同的随机结果。如果是None，它就使用np.random的默认RandomState实例。如果是一个RandomState实例，它就直接使用该实例生成随机数。</p>
+<p>问2：random_state参数对模型性能有什么影响？</p>
+<p>答2：根据搜索结果，random_state参数对模型性能有一定的影响，因为它决定了数据的随机性。不同的随机性可能导致不同的模型结果，例如聚类模型中的簇数。但是，random_state参数并不是一个需要调优的超参数，因为它只影响模型在特定数据集上的表现，而不是模型本身的泛化能力。如果想要<strong>保证多次运行模型或者划分数据时得到相同的结果</strong>，可以指定一个固定的random_state值。</p>
+<p>问3：那么如何选择一个合适的random_state值呢？</p>
+<p>答3：选择一个合适的random_state值并没有一个固定的规则，只要保证每次运行代码时使用相同的值就可以了。这样可以确保数据的划分或者模型的训练是可重复的。一般来说，可以使用任意一个整数作为random_state值，例如<strong>0或者42</strong>，或者使用默认的None。但是如果想要比较不同模型或者参数的效果，最好固定一个random_state值。</p>
+<ul>
+<li><p>总结：random_state是便于多次训练得到同一棵树，防止模型无法复现，比如决策树分枝的时候，如果多个特征的不纯度一样，使用这个随机数就可以保证随机每次选取的划分特征是一样的，再例如一些连续特征，计算分割点就需要随机，模型需要复现，就要保证这个随机性每次都一样。</p>
+</li>
+<li><p>比如说如果像前面那样没有设置random_state参数，多次重复运行代码，得到的score值可能会不同。</p>
+</li>
+</ul>
+<p>可以运行下面这段代码验证：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">score_cmp = []<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100</span>):<br>    clf = tree.DecisionTreeClassifier(criterion=<span class="hljs-string">&#x27;entropy&#x27;</span>)<br>    clf = clf.fit(Xtrain, Ytrain) <span class="hljs-comment"># 模型训练</span><br>    score = clf.score(Xtest, Ytest) <span class="hljs-comment"># 返回模型精确度，accuracy  </span><br>    score_cmp.append(score)<br>plt.figure(dpi=<span class="hljs-number">200</span>)<br>plt.plot(<span class="hljs-built_in">range</span>(<span class="hljs-number">100</span>), score_cmp, <span class="hljs-string">&#x27;r-&#x27;</span>)<br>plt.show()<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007221.png" srcset="/img/loading.gif" lazyload alt="image-20230317111607371" style="zoom:50%;" /></p>
+<ul>
+<li>可以看出重复运行100次，得到的score的值会不同</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">score_cmp = []<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100</span>):<br>    clf = tree.DecisionTreeClassifier(criterion=<span class="hljs-string">&#x27;entropy&#x27;</span>, random_state=<span class="hljs-number">30</span>)<br>    clf = clf.fit(Xtrain, Ytrain) <span class="hljs-comment"># 模型训练</span><br>    score = clf.score(Xtest, Ytest) <span class="hljs-comment"># 返回模型精确度，accuracy  </span><br>    score_cmp.append(score)<br>plt.figure(dpi=<span class="hljs-number">200</span>)<br>plt.plot(<span class="hljs-built_in">range</span>(<span class="hljs-number">100</span>), score_cmp, <span class="hljs-string">&#x27;r-&#x27;</span>)<br>plt.show()<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007587.png" srcset="/img/loading.gif" lazyload alt="image-20230317112505943" style="zoom:50%;" /></p>
+<ul>
+<li>可以看出增加了random_state参数后，即使重复运行代码100遍，得到的score始终保持不变</li>
+</ul>
+<p>至于splitter参数：</p>
+<ul>
+<li>splitter参数对模型的影响主要体现在分枝时的随机性和效率上。如果设置为’best’，则决策树会优先选择更重要（按照不纯度设置的基尼系数或者信息熵的值）的特征进行分枝，这样可以得到更准确和更简洁的决策树，但是计算量也会更大。如果设置为’random’，则决策树会更加随机地选择特征进行分枝，这样可以增加模型的多样性和鲁棒性，但是可能会降低模型的准确性和可解释性。</li>
+<li>你可以根据你的数据集和目标来选择合适的splitter参数。一般来说，如果数据集较小或者特征较少，可以使用’best’；如果数据集较大或者特征较多，可以使用’random’。</li>
+<li><strong>默认为‘best’</strong></li>
+<li>理解：就是说splitter设置为‘best’时是考虑所有的特征，在所有的特征中选择最好的一个作为划分结点的指标；而‘random’是先随机选择部分特征出来，再在这些筛选出来的指标中，找最好的一个作为划分结点的指标。这样操作可能会产生一些次优的分裂，但是却<strong>能够避免过拟合</strong>，提高模型的泛化能力（<strong>模型适用于新样本的能力</strong>）。</li>
+</ul>
+<h3 id="2-1-3剪枝参数"><a href="#2-1-3剪枝参数" class="headerlink" title="2.1.3剪枝参数"></a>2.1.3剪枝参数</h3><p>过拟合：学习器把训练样本学习的“太好”，将训练样本本身的特点当做所有样本的一般性质，导致模型的泛化能力下降。即<strong>训练集上表现的很好，但是在测试集上表现的很差</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 模型对训练集的拟合程度</span><br>score_train = clf.score(Xtrain, Ytrain)<br>score_train<br></code></pre></td></tr></table></figure>
+<p>sklearn提供了不同的策略：</p>
+<ul>
+<li><strong>max_depth</strong></li>
+</ul>
+<p>限制树的最大深度，超过设定深度的树枝全部剪掉</p>
+<p>这是用得最广泛的剪枝参数，在高维度低样本量时非常有效。决策树多生长一层，对样本量的需求会增加一倍，所以限制树深度能够有效地限制过拟合。在集成算法中也非常实用。实际使用时，建议从=3开始尝试，看看拟合的效果再决定是否增加设定深度。</p>
+<ul>
+<li><strong>min_samples_leaf &amp; min_samples_split</strong></li>
+</ul>
+<p>min_samples_leaf限定，一个节点在<strong>分枝后的每个子节点</strong>都必须包含至少<strong>min_samples_leaf</strong>个训练样本，否则分枝就不会发生，或者，分枝会朝着满足每个子节点都包含min_samples_leaf个样本的方向去发生。</p>
+<p>min_samples_split限定，<strong>一个节点</strong>必须要包含至少<strong>min_samples_split个训练样本</strong>，这个节点才允许被分枝，否则分枝就不会发生。</p>
+<blockquote>
+<p>那么究竟如何确定最优的剪枝参数呢？</p>
+</blockquote>
+<ul>
+<li>绘制超参数学习曲线</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">test = []<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    clf = tree.DecisionTreeClassifier(max_depth=i+<span class="hljs-number">1</span><br>                                    ,criterion=<span class="hljs-string">&quot;entropy&quot;</span><br>                                    ,random_state=<span class="hljs-number">30</span><br>                                    ,splitter=<span class="hljs-string">&quot;best&quot;</span><br>                                    )<br>    clf = clf.fit(Xtrain, Ytrain)<br>    score = clf.score(Xtest, Ytest)<br>    test.append(score)<br>plt.figure(dpi=<span class="hljs-number">200</span>)<br>plt.plot(<span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>,<span class="hljs-number">11</span>), test, color=<span class="hljs-string">&quot;red&quot;</span>, label=<span class="hljs-string">&quot;max_depth&quot;</span>)<br>plt.legend()<br>plt.show()<br></code></pre></td></tr></table></figure>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007628.png" srcset="/img/loading.gif" lazyload alt="image-20230317133114202" style="zoom:50%;" /></p>
+<ul>
+<li>超参数的学习曲线，是一条以超参数的取值为横坐标，模型的度量指标为纵坐标的曲线，它是用来衡量不同超参数取值下模型的表现的线。在我们建好的决策树里，我们的模型度量指标就是score。</li>
+</ul>
+<h3 id="2-1-4目标权重参数"><a href="#2-1-4目标权重参数" class="headerlink" title="2.1.4目标权重参数"></a>2.1.4目标权重参数</h3><ul>
+<li><strong>class_weight</strong></li>
+</ul>
+<p>对于样本不均衡问题，需要设置该参数。</p>
+<p>在sklearn的决策树算法中，<code>class_weight</code>参数的取值可以是以下三种：</p>
+<ol>
+<li><p><code>class_weight=None</code>（默认值）：表示不使用类别权重，所有类别的权重都为1。</p>
+</li>
+<li><p><code>class_weight=&#39;balanced&#39;</code>：表示使用类别权重，但是权重大小是自动根据训练数据中的类别频率进行计算的。具体来说，权重大小为：</p>
+<p><script type="math/tex">\frac{n_{samples}}{(n_{classes} * np.bincount(y))}</script>，其中n_samples表示样本总数，n_classes表示类别总数，np.bincount(y)表示每个类别的样本数。</p>
+</li>
+<li><p><code>class_weight=&#123;class_label: weight&#125;</code>：表示使用给定的类别权重。这里的<code>class_label</code>是类别的标签，<code>weight</code>是权重大小。可以通过手动指定<code>class_weight</code>参数来平衡不同类别之间的权重。</p>
+</li>
+</ol>
+<h2 id="2-2重要属性和接口"><a href="#2-2重要属性和接口" class="headerlink" title="2.2重要属性和接口"></a>2.2重要属性和接口</h2><p>属性是在模型训练之后，能够调用查看的模型的各种性质。对决策树来说，最重要的是<strong>feature<em>importances</em></strong>，能够查看各个特征对模型的重要性。</p>
+<p>sklearn中许多算法的接口都是相似的，比如说我们之前已经用到的<code>fit</code>和<code>score</code>，几乎对每个算法都可以使用。除了这两个接口之外，决策树最常用的接口还有<code>apply</code>和<code>predict</code>。</p>
+<p>apply中输入测试集返回每个测试样本所在的叶子节点的索引，predict输入测试集返回每个测试样本的标签。</p>
+<p>至此，我们已经学完了分类树DecisionTreeClassififier和用决策树绘图（export_graphviz）的所有基础。我们讲解了决策树的基本流程，分类树的八个参数，一个属性，四个接口，以及绘图所用的代码。</p>
+<p><strong>八个参数</strong>：criterion，两个随机性相关的参数（random_state，splitter），五个剪枝参数（max_depth,min_samples_split，min_samples_leaf，max_feature，min_impurity_decrease）</p>
+<p><strong>一个属性</strong>：feature<em>importances</em></p>
+<p><strong>四个接口</strong>：fit，score，apply，predict</p>
+<h1 id="3-DecisionTreeRegressor"><a href="#3-DecisionTreeRegressor" class="headerlink" title="3.DecisionTreeRegressor"></a>3.<strong>DecisionTreeRegressor</strong></h1><ul>
+<li>回归树</li>
+</ul>
+<p>class<code>sklearn.tree.DecisionTreeRegressor</code> (<em>criterion=’mse’</em>, <em>splitter=’best’</em>, <em>max_depth=None</em>,</p>
+<p><em>min_samples_split=2</em>, <em>min_samples_leaf=1</em>, <em>min_weight_fraction_leaf=0.0</em>, <em>max_features=None</em>,</p>
+<p><em>random_state=None</em>, <em>max_leaf_nodes=None</em>, <em>min_impurity_decrease=0.0</em>, <em>min_impurity_split=None</em>, <em>presort=False</em>)</p>
+<p>几乎所有参数，属性及接口都和分类树一模一样。需要注意的是，在回归树中，没有标签分布是否均衡的问题，因此没有class_weight这样的参数。</p>
+<h2 id="3-1重要参数、属性及接口"><a href="#3-1重要参数、属性及接口" class="headerlink" title="3.1重要参数、属性及接口"></a>3.1重要参数、属性及接口</h2><h3 id="criterion"><a href="#criterion" class="headerlink" title="criterion"></a>criterion</h3><p>1）输入”mse”使用均方误差mean squared error(MSE)，父节点和叶子节点之间的均方误差的差额将被用来作为</p>
+<p>特征选择的标准，这种方法通过使用叶子节点的均值来最小化L2损失</p>
+<p>2）输入“friedman_mse”使用费尔德曼均方误差，这种指标使用弗里德曼针对潜在分枝中的问题改进后的均方误差</p>
+<p>3）输入”mae”使用绝对平均误差MAE（mean absolute error），这种指标使用叶节点的中值来最小化L1损失</p>
+<p>属性中最重要的依然是feature<em>importances</em>，接口依然是apply, fifit, predict, score最核心。</p>
+<script type="math/tex; mode=display">MSE=\frac{1}{N}\sum_{i=1}^{N}{(f_i-y_i)^2}</script><p>然而，<strong>回归树的接口</strong>score返回的是R平方，并不是MSE.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> load_boston<br><span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> cross_val_score<br><span class="hljs-keyword">from</span> sklearn.tree <span class="hljs-keyword">import</span> DecisionTreeRegressor<br>boston = load_boston() <span class="hljs-comment"># 波士顿房价数据</span><br>regressor = DecisionTreeRegressor(random_state=<span class="hljs-number">0</span>) <span class="hljs-comment">#实例化</span><br>cross_val_score(regressor, boston.data, boston.target, cv=<span class="hljs-number">10</span>, scoring = <span class="hljs-string">&quot;neg_mean_squared_error&quot;</span>)<br><span class="hljs-comment"># 不设置scoring返回的是R方</span><br><span class="hljs-comment"># cross_val_score：交叉验证</span><br></code></pre></td></tr></table></figure>
+<p>交叉验证是用来观察模型的稳定性的一种方法，我们将数据划分为n份，<strong>依次使用其中一份作为测试集，其他n-1份作为训练集</strong>，多次计算模型的精确性来评估模型的平均准确程度。训练集和测试集的划分会干扰模型的结果，因此用交叉验证n次的结果求出的平均值，是对模型效果的一个更好的度量。</p>
+<p><img src="https://167.oss-cn-hangzhou.aliyuncs.com/img/202303261007697.png" srcset="/img/loading.gif" lazyload alt="image-20230318093158941"></p>
+<ul>
+<li>n次测试也叫<strong>n折交叉验证</strong></li>
+</ul>
+<p>注意：所有接口中要求输入<strong>X_train和X_test</strong>的部分，输入的特征矩阵必须<strong>至少是一个二维矩阵</strong>。sklearn不接受任何一维矩阵作为特征矩阵被输入。</p>
+<ul>
+<li><p>包括fit、apply、predict、score等</p>
+</li>
+<li><p>增维可以考虑reshape(-1,1)和使用np.newaxis</p>
+</li>
+</ul>
+<h1 id="4-泰坦尼克号案例"><a href="#4-泰坦尼克号案例" class="headerlink" title="4.泰坦尼克号案例"></a>4.泰坦尼克号案例</h1><p>score_te代表了决策树分类器在交叉验证中的平均精度。交叉验证是一种评估模型性能的方法，它将数据集分成k个子集，每次用一个子集作为测试集，其余的作为训练集，然后计算测试集上的精度。这样重复k次，得到k个精度值，然后取平均值作为最终的评估指标。</p>
+<p>score_tr代表了决策树分类器在训练集上的精度。训练集是用来训练模型的数据，它包含了特征和标签。精度是一种衡量模型预测能力的指标，它等于正确预测的样本数除以总样本数。</p>
+<ul>
+<li>为什么不直接计算在测试集上的精度，而是计算交叉验证的平均精度呢？</li>
+</ul>
+<p>直接计算在测试集上的精度可能会受到测试集的随机性和大小的影响，导致评估结果不稳定或不准确。交叉验证可以利用所有的数据来进行训练和测试，避免了数据的浪费和偏差，提高了评估的可靠性和泛化能力。</p>
+<ul>
+<li>我的意思是cross_val_score()传入的clf是使用xtrain和ytrain训练后的，这样不会有影响吗？</li>
+</ul>
+<p>我明白您的意思了。其实，cross_val_score()函数会忽略传入的clf的训练状态，而是在内部重新使用x和y进行交叉验证，并返回每次测试集上的精度值。所以，您不用担心传入的clf会影响交叉验证的结果。</p>
+<ul>
+<li>那这里的交叉验证的目的是什么呢？</li>
+</ul>
+<p>这里的交叉验证的目的是为了评估不同的max_depth参数对决策树分类器的性能的影响。max_depth参数控制了决策树的最大深度，也就是最多可以分裂多少次。如果max_depth太小，可能会导致模型欠拟合，无法捕捉数据的复杂性；如果max_depth太大，可能会导致模型过拟合，无法泛化到新的数据。所以，我们需要找到一个合适的max_depth值，使得模型既不欠拟合也不过拟合。</p>
+<ul>
+<li>那这里的score_tr和score_te有关系吗？</li>
+</ul>
+<p>有关系的。score_tr和score_te都是用来衡量模型性能的指标，只不过一个是在训练集上，一个是在交叉验证上。一般来说，当max_depth增加时，score_tr会增加，因为模型可以更好地拟合训练集；但是score_te可能会先增加后减少，因为模型可能会出现过拟合的现象。所以，我们可以通过观察score_tr和score_te随着max_depth变化的曲线，来判断模型是否欠拟合或过拟合。</p>
+<p><strong>网格搜索：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 网格搜索：能够帮助我们同时调整多个参数的技术，枚举技术</span><br><span class="hljs-comment"># 一串参数和这些参数对应的，我们希望网格搜索来搜索的参数的取值范围</span><br>gini_threholds = np.linspace(<span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">10</span>) <span class="hljs-comment"># 基尼系数</span><br>parameters = &#123;<span class="hljs-string">&#x27;criterion&#x27;</span>:(<span class="hljs-string">&#x27;gini&#x27;</span>, <span class="hljs-string">&#x27;entropy&#x27;</span>)<br>                ,<span class="hljs-string">&#x27;splitter&#x27;</span>:(<span class="hljs-string">&#x27;best&#x27;</span>, <span class="hljs-string">&#x27;random&#x27;</span>)<br>                ,<span class="hljs-string">&#x27;max_depth&#x27;</span>:[*<span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>)]<br>                ,<span class="hljs-string">&#x27;min_samples_leaf&#x27;</span>:[*<span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">50</span>, <span class="hljs-number">5</span>)]<br>                ,<span class="hljs-string">&#x27;min_impurity_decrease&#x27;</span>:[*np.linspace(<span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">20</span>)]<br>&#125;<br>clf = DecisionTreeClassifier(random_state=<span class="hljs-number">0</span>)<br>GS = GridSearchCV(clf, parameters, cv=<span class="hljs-number">10</span>)<br>GS = GS.fit(xtrain, ytrain)<br></code></pre></td></tr></table></figure>
+<ul>
+<li>GS.best<em>params</em> <em># 最佳参数</em></li>
+<li>GS.best<em>score</em> <em># 模型评判标准</em></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Machine-Learing/" class="category-chain-item">Machine Learing</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">#机器学习</a>
+      
+        <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/">#决策树</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>决策树算法</div>
+      <div>http://zyc.com/2023/03/26/决策树算法/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ZYC</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年3月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/03/26/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
