@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://c-167.github.io/2023/04/01/hexo-bo-ke-fulid-zhu-ti-pei-zhi-waline-ping-lun-xi-tong/</loc>
+    
+    <lastmod>2023-04-01</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://c-167.github.io/2023/03/31/ru-he-shi-yong-windows-terminal-da-kai-git-bash/</loc>
     
     <lastmod>2023-03-31</lastmod>
