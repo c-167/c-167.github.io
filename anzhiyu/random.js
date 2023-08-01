@@ -1,0 +1,1 @@
+var posts=["hexo搭建个人博客/","会计学-第1章-总论/","决策树算法/","基础算法（排序-二分）/","如何使用windows-terminal打开git-bash/","hexo博客fulid主题配置waline评论系统/"];function toRandomPost(){pjax.loadUrl('/'+posts[Math.floor(Math.random() * posts.length)]);};
